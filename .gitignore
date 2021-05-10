@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+*.orig
+*.log
+npm-debug.log.*
+.vscode/
+.idea
+*.iml

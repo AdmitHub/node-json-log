@@ -1,0 +1,30 @@
+{
+  "name": "node-json-log",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf ./build && tsc",
+    "lint": "tslint --project ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^15.0.1",
+    "@types/raven": "^2.5.3",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.1.1",
+    "tslint": "^6.1.3",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "@types/bunyan": "^1.8.6",
+    "bunyan": "^1.8.15",
+    "dd-trace": "^0.33.1",
+    "dotenv": "^8.2.0",
+    "raven": "^2.6.4",
+    "winston": "^3.3.3"
+  }
+}
