@@ -14,37 +14,38 @@ import Logger, {
 } from 'bunyan'
 import os from 'os'
 import config from './config'
-import Raven, { CaptureOptions } from 'raven'
+import Raven, {CaptureOptions} from 'raven'
 import enforcedSerializers from './serializers'
 import tracer from 'dd-trace'
+import bunyan from "bunyan"
 
-class TracingLogger extends Logger {
+class TracingLogger extends bunyan {
   report(...args: any[]) {
     const data = args[0]
     let exception: Error
-    let toLog: {[key: string]: any}
+    let toLog: { [key: string]: any }
     let message: string
     let sentryMsg: string
 
     if (typeof data === 'string') {
       exception = new Error(data)
-      toLog = { err: exception }
+      toLog = {err: exception}
       message = data
     } else if (data instanceof Error) {
       exception = data
-      toLog = { err: exception }
+      toLog = {err: exception}
       message = exception.message
     } else if (data && typeof data === 'object') {
-      if(data.err instanceof Error || data.error instanceof Error) {
+      if (data.err instanceof Error || data.error instanceof Error) {
         exception = data.err || data.error
       } else {
         exception = new Error(data.err || data.error || 'No error provided')
       }
-      toLog = { ...data, err: exception }
+      toLog = {...data, err: exception}
       message = args[1] || exception.message
     } else {
       exception = new Error('Unknown data type provided')
-      toLog = { err: exception }
+      toLog = {err: exception}
       message = 'Unknown data type provided'
     }
 
@@ -70,28 +71,40 @@ class TracingLogger extends Logger {
     return this.scopedLogEmitter(ERROR, toLog, ...args, sentryMsg)
   }
 
-  // @ts-ignore
-  trace(...args: any[]): void {
+
+  trace(): boolean
+  trace(error: Error | any, ...params: any[]): void
+  trace(...args: any[]): void | boolean {
     return this.scopedLogEmitter(TRACE, ...args)
   }
-  // @ts-ignore
-  debug(...args: any[]): void {
+
+  debug(): boolean
+  debug(error: Error | any, ...params: any[]): void
+  debug(...args: any[]): void | boolean {
     return this.scopedLogEmitter(DEBUG, ...args)
   }
-  // @ts-ignore
-  info(...args: any[]): void {
+
+  info(error: Error | any, ...params: any[]): void
+  info(): boolean
+  info(...args: any[]): void | boolean {
     return this.scopedLogEmitter(INFO, ...args)
   }
-  // @ts-ignore
-  warn(...args: any[]): void {
+
+  warn(): boolean
+  warn(error: Error | any, ...params: any[]): void
+  warn(...args: any[]): void | boolean {
     return this.scopedLogEmitter(WARN, ...args)
   }
-  // @ts-ignore
-  error(...args: any[]): void {
+
+  error(): boolean
+  error(error: Error | any, ...params: any[]): void
+  error(...args: any[]): void | boolean {
     return this.scopedLogEmitter(ERROR, ...args)
   }
-  // @ts-ignore
-  fatal(...args: any[]): void {
+
+  fatal(): boolean
+  fatal(error: Error | any, ...params: any[]): void
+  fatal(...args: any[]): void | boolean {
     return this.scopedLogEmitter(FATAL, ...args)
   }
 
@@ -121,7 +134,7 @@ class TracingLogger extends Logger {
   }
 }
 
-const createLogger = (options: LoggerOptions = { name: '' }) => {
+const createLogger = (options: LoggerOptions = {name: ''}) => {
   const streams: Stream[] = [
     {
       level: config.logLevel as LogLevel,
@@ -136,10 +149,10 @@ const createLogger = (options: LoggerOptions = { name: '' }) => {
     })
   }
 
-  let serializers = { ...stdSerializers, ...enforcedSerializers }
+  let serializers = {...stdSerializers, ...enforcedSerializers}
 
   if (options.serializers) {
-    serializers = { ...serializers, ...options.serializers }
+    serializers = {...serializers, ...options.serializers}
   }
 
   const defaultOptions: LoggerOptions = {
@@ -161,4 +174,4 @@ const createLogger = (options: LoggerOptions = { name: '' }) => {
   return logger
 }
 
-export { createLogger }
+export {createLogger}
