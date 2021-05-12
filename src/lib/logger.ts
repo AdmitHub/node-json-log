@@ -17,9 +17,8 @@ import config from './config'
 import Raven, {CaptureOptions} from 'raven'
 import enforcedSerializers from './serializers'
 import tracer from 'dd-trace'
-import bunyan from "bunyan"
 
-class TracingLogger extends bunyan {
+class TracingLogger extends Logger {
   report(obj?: { [key: string]: any } | string, ...params: any[]) {
     const data = obj
     let exception: Error
@@ -121,7 +120,7 @@ class TracingLogger extends bunyan {
     super[levelName](obj, ...params)
   }
 
-  _isLogInScope(data: any) {
+  _isLogInScope(data: any): boolean {
     if (typeof data !== 'object') {
       return false
     }
@@ -172,4 +171,4 @@ const createLogger = (options: LoggerOptions = {name: ''}) => {
   return logger
 }
 
-export {createLogger}
+export { createLogger }

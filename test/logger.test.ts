@@ -1,5 +1,3 @@
-import logger from '../src'
-
 describe('TracingLogger', () => {
   const OLD_ENV = process.env
   let spyLogTrace: jest.SpyInstance
@@ -11,22 +9,24 @@ describe('TracingLogger', () => {
   let log: any
 
   beforeEach(() => {
+    jest.resetModules()
     process.env = {
       ...OLD_ENV,
       LOG_LEVEL: 'trace'
     }
+    const logger = require('../src')
     log = logger.createLogger()
     spyLogTrace = jest.spyOn(require('bunyan').prototype, 'trace')
     spyLogDebug = jest.spyOn(require('bunyan').prototype, 'debug')
     spyLogInfo = jest.spyOn(require('bunyan').prototype, 'info')
     spyLogWarn = jest.spyOn(require('bunyan').prototype, 'warn')
     spyLogError = jest.spyOn(require('bunyan').prototype, 'error')
-    spyLogFatal = jest.spyOn(require('bunyan').prototype, 'error')
+    spyLogFatal = jest.spyOn(require('bunyan').prototype, 'fatal')
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    process.env = OLD_ENV
+    process.env = { ...OLD_ENV }
   });
 
   it('expect trace level log to be called', () => {
@@ -72,22 +72,26 @@ describe('TracingLogger', () => {
   })
 
   it('expect log to be promoted to higher log level if scope is in log scopes', () => {
+    jest.resetModules()
     process.env = {
       ...OLD_ENV,
       LOG_LEVEL: 'warn',
-      LOG_SCOPES: 'info'
+      LOG_SCOPES: 'scoped.log'
     }
+    spyLogInfo = jest.spyOn(require('bunyan').prototype, 'info')
+    spyLogWarn = jest.spyOn(require('bunyan').prototype, 'warn')
+    const logger = require('../src')
     log = logger.createLogger()
 
     log.info({
-      scope: 'info'
-    }, 'Info Message')
+      scope: 'scoped.log'
+    }, 'Promoted Scoped Log')
 
     expect(spyLogInfo).not.toHaveBeenCalled()
     expect(spyLogWarn).toHaveBeenCalled()
   })
 
-  it('ADD TEST FOR REPORT', () => {
+  it('expect to log error and report to sentry', () => {
 
   })
 })
