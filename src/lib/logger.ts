@@ -20,8 +20,8 @@ import tracer from 'dd-trace'
 import bunyan from "bunyan"
 
 class TracingLogger extends bunyan {
-  report(...args: any[]) {
-    const data = args[0]
+  report(obj?: { [key: string]: any } | string, ...params: any[]) {
+    const data = obj
     let exception: Error
     let toLog: { [key: string]: any }
     let message: string
@@ -42,7 +42,7 @@ class TracingLogger extends bunyan {
         exception = new Error(data.err || data.error || 'No error provided')
       }
       toLog = {...data, err: exception}
-      message = args[1] || exception.message
+      message = exception.message
     } else {
       exception = new Error('Unknown data type provided')
       toLog = {err: exception}
@@ -65,52 +65,51 @@ class TracingLogger extends bunyan {
     }
 
     if (message) {
-      args = [message, ...args]
+      params = [message, ...params]
     }
 
-    return this.scopedLogEmitter(ERROR, toLog, ...args, sentryMsg)
+    return this.scopedLogEmitter(ERROR, toLog, ...params, sentryMsg)
   }
-
 
   trace(): boolean
   trace(error: Error | any, ...params: any[]): void
-  trace(...args: any[]): void | boolean {
-    return this.scopedLogEmitter(TRACE, ...args)
+  trace(obj?: object, ...params: any[]): void | boolean {
+    return this.scopedLogEmitter(TRACE, obj, ...params)
   }
 
   debug(): boolean
   debug(error: Error | any, ...params: any[]): void
-  debug(...args: any[]): void | boolean {
-    return this.scopedLogEmitter(DEBUG, ...args)
+  debug(obj?: object, ...params: any[]): void | boolean {
+    return this.scopedLogEmitter(DEBUG, obj, ...params)
   }
 
   info(error: Error | any, ...params: any[]): void
   info(): boolean
-  info(...args: any[]): void | boolean {
-    return this.scopedLogEmitter(INFO, ...args)
+  info(obj?: object, ...params: any[]): void | boolean {
+    return this.scopedLogEmitter(INFO, obj, ...params)
   }
 
   warn(): boolean
   warn(error: Error | any, ...params: any[]): void
-  warn(...args: any[]): void | boolean {
-    return this.scopedLogEmitter(WARN, ...args)
+  warn(obj?: object, ...params: any[]): void | boolean {
+    return this.scopedLogEmitter(WARN, obj, ...params)
   }
 
   error(): boolean
   error(error: Error | any, ...params: any[]): void
-  error(...args: any[]): void | boolean {
-    return this.scopedLogEmitter(ERROR, ...args)
+  error(obj?: object, ...params: any[]): void | boolean {
+    return this.scopedLogEmitter(ERROR, obj, ...params)
   }
 
   fatal(): boolean
   fatal(error: Error | any, ...params: any[]): void
-  fatal(...args: any[]): void | boolean {
-    return this.scopedLogEmitter(FATAL, ...args)
+  fatal(obj?: object, ...params: any[]): void | boolean {
+    return this.scopedLogEmitter(FATAL, obj, ...params)
   }
 
-  scopedLogEmitter(logLevel: number, ...args: any[]): void {
+  scopedLogEmitter(logLevel: number, obj: object | undefined, ...params: any[]): void {
     const currentEnabledLevel: number = super.level()
-    const isLogInScope: boolean = this._isLogInScope(args[0])
+    const isLogInScope: boolean = this._isLogInScope(obj)
     let level: number = logLevel
 
     if (isLogInScope && level < currentEnabledLevel) {
@@ -119,8 +118,7 @@ class TracingLogger extends bunyan {
 
     const levelName: LogLevelString = nameFromLevel[level] as LogLevelString
 
-    // @ts-ignore
-    super[levelName](...args)
+    super[levelName](obj, ...params)
   }
 
   _isLogInScope(data: any) {
