@@ -17,9 +17,8 @@ import config from './config'
 import Raven, {CaptureOptions} from 'raven'
 import enforcedSerializers from './serializers'
 import tracer from 'dd-trace'
-import bunyan from "bunyan"
 
-export class TracingLogger extends bunyan {
+export class TracingLogger extends Logger {
   report(obj?: { [key: string]: any } | string, ...params: any[]) {
     const data = obj
     let exception: Error
