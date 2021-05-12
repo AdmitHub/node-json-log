@@ -59,7 +59,7 @@ export = {
 
   sentryUrl: process.env.SENTRY_URL,
 
-  ravenWasInstalled: true, // maybe remove
+  ravenWasInstalled: true,
 
   tracingEnabled: parseBool(
     process.env.DD_LOGS_INJECTION,
