@@ -132,7 +132,7 @@ class TracingLogger extends bunyan {
   }
 }
 
-const createLogger = (options: LoggerOptions = {name: ''}) => {
+const createLogger = (options: LoggerOptions = {name: ''}): TracingLogger => {
   const streams: Stream[] = [
     {
       level: config.logLevel as LogLevel,
