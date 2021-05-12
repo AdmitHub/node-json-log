@@ -34,7 +34,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createLogger = void 0;
+exports.createLogger = exports.TracingLogger = void 0;
 var bunyan_1 = require("bunyan");
 var os_1 = __importDefault(require("os"));
 var config_1 = __importDefault(require("./config"));
@@ -165,6 +165,7 @@ var TracingLogger = /** @class */ (function (_super) {
     };
     return TracingLogger;
 }(bunyan_2.default));
+exports.TracingLogger = TracingLogger;
 var createLogger = function (options) {
     if (options === void 0) { options = { name: '' }; }
     var streams = [

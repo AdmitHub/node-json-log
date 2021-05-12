@@ -19,7 +19,7 @@ import enforcedSerializers from './serializers'
 import tracer from 'dd-trace'
 import bunyan from "bunyan"
 
-class TracingLogger extends bunyan {
+export class TracingLogger extends bunyan {
   report(obj?: { [key: string]: any } | string, ...params: any[]) {
     const data = obj
     let exception: Error
