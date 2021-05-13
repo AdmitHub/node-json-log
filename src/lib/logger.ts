@@ -1,10 +1,5 @@
+import './tracer'
 import config from './config'
-import tracer from 'dd-trace'
-if (config.tracingEnabled) {
-  tracer.init({
-    logInjection: true
-  })
-}
 import Logger, {
   TRACE,
   INFO,

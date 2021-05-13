@@ -54,13 +54,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createLogger = exports.TracingLogger = void 0;
+require("./tracer");
 var config_1 = __importDefault(require("./config"));
-var dd_trace_1 = __importDefault(require("dd-trace"));
-if (config_1.default.tracingEnabled) {
-    dd_trace_1.default.init({
-        logInjection: true
-    });
-}
 var bunyan_1 = __importStar(require("bunyan"));
 var os_1 = __importDefault(require("os"));
 var raven_1 = __importDefault(require("raven"));
