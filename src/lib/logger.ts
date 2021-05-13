@@ -1,3 +1,10 @@
+import config from './config'
+import tracer from 'dd-trace'
+if (config.tracingEnabled) {
+  tracer.init({
+    logInjection: true
+  })
+}
 import Logger, {
   TRACE,
   INFO,
@@ -13,10 +20,8 @@ import Logger, {
   LogLevelString,
 } from 'bunyan'
 import os from 'os'
-import config from './config'
 import Raven, {CaptureOptions} from 'raven'
 import enforcedSerializers from './serializers'
-import tracer from 'dd-trace'
 
 export class TracingLogger extends Logger {
   report(obj?: { [key: string]: any } | string, ...params: any[]) {
@@ -160,15 +165,7 @@ const createLogger = (options: LoggerOptions = {name: ''}): TracingLogger => {
     name: os.hostname().split('-cmd')[0]
   }
 
-  const logger = new TracingLogger(defaultOptions)
-
-  if (config.tracingEnabled) {
-    tracer.init({
-      logInjection: true
-    })
-  }
-
-  return logger
+  return new TracingLogger(defaultOptions)
 }
 
 export {createLogger}
