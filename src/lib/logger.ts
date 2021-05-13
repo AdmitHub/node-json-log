@@ -1,4 +1,3 @@
-import './tracer'
 import config from './config'
 import Logger, {
   TRACE,
