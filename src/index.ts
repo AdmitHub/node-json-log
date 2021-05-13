@@ -9,5 +9,5 @@ export = {
   installLogger: (config: ConstructorOptions) => {
     installRaven(config)
   },
-  trace: tracer.trace
+  tracer
 }
