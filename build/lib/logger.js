@@ -53,13 +53,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createLogger = void 0;
+exports.createLogger = exports.TracingLogger = void 0;
+var config_1 = __importDefault(require("./config"));
 var bunyan_1 = __importStar(require("bunyan"));
 var os_1 = __importDefault(require("os"));
-var config_1 = __importDefault(require("./config"));
 var raven_1 = __importDefault(require("raven"));
 var serializers_1 = __importDefault(require("./serializers"));
-var dd_trace_1 = __importDefault(require("dd-trace"));
 var TracingLogger = /** @class */ (function (_super) {
     __extends(TracingLogger, _super);
     function TracingLogger() {
@@ -183,6 +182,7 @@ var TracingLogger = /** @class */ (function (_super) {
     };
     return TracingLogger;
 }(bunyan_1.default));
+exports.TracingLogger = TracingLogger;
 var createLogger = function (options) {
     if (options === void 0) { options = { name: '' }; }
     var streams = [
@@ -208,12 +208,6 @@ var createLogger = function (options) {
         streams: streams,
         name: os_1.default.hostname().split('-cmd')[0]
     };
-    var logger = new TracingLogger(defaultOptions);
-    if (config_1.default.tracingEnabled) {
-        dd_trace_1.default.init({
-            logInjection: true
-        });
-    }
-    return logger;
+    return new TracingLogger(defaultOptions);
 };
 exports.createLogger = createLogger;

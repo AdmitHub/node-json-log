@@ -1,3 +1,4 @@
+import config from './config'
 import Logger, {
   TRACE,
   INFO,
@@ -13,12 +14,10 @@ import Logger, {
   LogLevelString,
 } from 'bunyan'
 import os from 'os'
-import config from './config'
 import Raven, {CaptureOptions} from 'raven'
 import enforcedSerializers from './serializers'
-import tracer from 'dd-trace'
 
-class TracingLogger extends Logger {
+export class TracingLogger extends Logger {
   report(obj?: { [key: string]: any } | string, ...params: any[]) {
     const data = obj
     let exception: Error
@@ -120,7 +119,7 @@ class TracingLogger extends Logger {
     super[levelName](obj, ...params)
   }
 
-  _isLogInScope(data: any): boolean {
+  _isLogInScope(data: any) {
     if (typeof data !== 'object') {
       return false
     }
@@ -131,7 +130,7 @@ class TracingLogger extends Logger {
   }
 }
 
-const createLogger = (options: LoggerOptions = {name: ''}) => {
+const createLogger = (options: LoggerOptions = {name: ''}): TracingLogger => {
   const streams: Stream[] = [
     {
       level: config.logLevel as LogLevel,
@@ -160,15 +159,7 @@ const createLogger = (options: LoggerOptions = {name: ''}) => {
     name: os.hostname().split('-cmd')[0]
   }
 
-  const logger = new TracingLogger(defaultOptions)
-
-  if (config.tracingEnabled) {
-    tracer.init({
-      logInjection: true
-    })
-  }
-
-  return logger
+  return new TracingLogger(defaultOptions)
 }
 
-export { createLogger }
+export {createLogger}
