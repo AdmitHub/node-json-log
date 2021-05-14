@@ -22,9 +22,8 @@ Based on practices laid out in [Logging Best Practices](https://admithubteam.atl
 
 # Usage
 - Install, which is handled via `installLogger`. This will install Raven and handle hooking it up to environment variables and logging
-- Logger, which is used via `createLogger`, or `log` keys from `require('node-json-log')`
+- Logger, which is used via `createLogger` key from `require('node-json-log')`
 ```javascript
-const logger = require('node-json-log').log
 const logger = require('node-json-log').createLoger()
 
 try {
@@ -45,4 +44,13 @@ node v14.16.1
 ### Run
 ```
 npm run build
+```
+
+# Test
+
+Tests are written using Jest
+
+To run tests run command
+```
+npm run test
 ```
