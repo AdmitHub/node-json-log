@@ -1,3 +1,5 @@
+import config from '../src/lib/config'
+
 describe('TracingLogger', () => {
   const OLD_ENV = process.env
   let spyLogTrace: jest.SpyInstance
@@ -16,6 +18,9 @@ describe('TracingLogger', () => {
     }
     const logger = require('../src')
     log = logger.createLogger()
+    jest.mock('raven', () => ({
+      captureException: jest.fn()
+    }))
     spyLogTrace = jest.spyOn(require('bunyan').prototype, 'trace')
     spyLogDebug = jest.spyOn(require('bunyan').prototype, 'debug')
     spyLogInfo = jest.spyOn(require('bunyan').prototype, 'info')
@@ -91,7 +96,15 @@ describe('TracingLogger', () => {
     expect(spyLogWarn).toHaveBeenCalled()
   })
 
-  it('expect to log error and report to sentry', () => {
+  it('expect report to log error and report to sentry', () => {
+    config.ravenWasInstalled = true
+    const raven = require('raven')
 
+    log.report({
+      scope: 'call.failed'
+    }, 'Reported Log')
+
+    expect(spyLogError).toHaveBeenCalled()
+    expect(raven.captureException).toHaveBeenCalled()
   })
 })
