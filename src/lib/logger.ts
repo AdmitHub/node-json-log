@@ -14,7 +14,7 @@ import Logger, {
   LogLevelString,
 } from 'bunyan'
 import os from 'os'
-import Raven, {CaptureOptions} from 'raven'
+import Raven, { CaptureOptions } from 'raven'
 import enforcedSerializers from './serializers'
 
 export class TracingLogger extends Logger {

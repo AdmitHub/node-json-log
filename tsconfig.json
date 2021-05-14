@@ -15,6 +15,11 @@
     "declaration": false,
     "typeRoots": [ "types", "./node_modules/@types"]
   },
-  "exclude": [ "node_modules", "build" ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "test",
+    "jest.config.js"
+  ],
   "types": [ "typePatches", "jest", "node" ],
 }
