@@ -1,11 +1,11 @@
 import tracer from './lib/tracer'
 import { createLogger } from './lib/logger'
 import { installRaven } from './lib/raven-initializer'
-import { ConstructorOptions } from 'raven'
+import { NodeOptions } from '@sentry/node'
 
 export = {
   createLogger,
-  installLogger: (config: ConstructorOptions) => {
+  installLogger: (config: NodeOptions) => {
     installRaven(config)
   },
   tracer

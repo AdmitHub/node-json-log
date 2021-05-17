@@ -57,7 +57,7 @@ exports.createLogger = exports.TracingLogger = void 0;
 var config_1 = __importDefault(require("./config"));
 var bunyan_1 = __importStar(require("bunyan"));
 var os_1 = __importDefault(require("os"));
-var raven_1 = __importDefault(require("raven"));
+var node_1 = __importDefault(require("@sentry/node"));
 var serializers_1 = __importDefault(require("./serializers"));
 var TracingLogger = /** @class */ (function (_super) {
     __extends(TracingLogger, _super);
@@ -105,7 +105,7 @@ var TracingLogger = /** @class */ (function (_super) {
                     scope: toLog.scope
                 }
             };
-            toLog.sentry_id = raven_1.default.captureException(exception, sentryObject);
+            toLog.sentry_id = node_1.default.captureException(exception, sentryObject);
             sentryMsg = '[Logged to Sentry]';
         }
         else {

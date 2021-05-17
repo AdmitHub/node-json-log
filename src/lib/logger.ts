@@ -14,7 +14,8 @@ import Logger, {
   LogLevelString,
 } from 'bunyan'
 import os from 'os'
-import Raven, { CaptureOptions } from 'raven'
+import Raven from '@sentry/node'
+
 import enforcedSerializers from './serializers'
 
 export class TracingLogger extends Logger {
@@ -48,7 +49,7 @@ export class TracingLogger extends Logger {
     }
 
     if (config.ravenWasInstalled) {
-      const sentryObject: CaptureOptions = {
+      const sentryObject = {
         tags: {
           scope: toLog.scope
         }
