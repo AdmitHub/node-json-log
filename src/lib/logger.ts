@@ -14,7 +14,7 @@ import Logger, {
   LogLevelString,
 } from 'bunyan'
 import os from 'os'
-import Raven from '@sentry/node'
+import  * as Raven from '@sentry/node'
 
 import enforcedSerializers from './serializers'
 
