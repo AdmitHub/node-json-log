@@ -105,8 +105,7 @@ describe('TracingLogger', () => {
       sentry: {
         captureException: captureExceptionMock,
         setTag: setTagMock
-      } as any,
-      name: 'asd'
+      } as any
     } as TracingLoggerOptions)
 
     log.report({

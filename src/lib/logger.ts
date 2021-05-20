@@ -21,13 +21,14 @@ export type NotFunction<T> = T extends Function ? never : T
 export type LogObject<T> = {
   [key: string]: NotFunction<T>
 }
-export type TracingLoggerOptions = LoggerOptions & { sentry?: typeof Sentry }
+export type TracingLoggerOptions = Omit<LoggerOptions, 'name'> & { sentry?: typeof Sentry }
 
 export class TracingLogger extends Logger {
   sentry?: typeof Sentry
   constructor(options: TracingLoggerOptions) {
     super(options as LoggerOptions)
-    this.sentry  = options.sentry
+    console.log('options.sentry ', options.sentry)
+    this.sentry = options.sentry
   }
 
   report<T>(obj?: LogObject<T> | Error | string, ...params: NotFunction<T>[]) {
