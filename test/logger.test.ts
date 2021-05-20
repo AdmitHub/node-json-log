@@ -18,8 +18,9 @@ describe('TracingLogger', () => {
     }
     const logger = require('../src')
     log = logger.createLogger()
-    jest.mock('raven', () => ({
-      captureException: jest.fn()
+    jest.mock('@sentry/node', () => ({
+      captureException: jest.fn(),
+      setTag: jest.fn()
     }))
     spyLogTrace = jest.spyOn(require('bunyan').prototype, 'trace')
     spyLogDebug = jest.spyOn(require('bunyan').prototype, 'debug')
@@ -98,7 +99,7 @@ describe('TracingLogger', () => {
 
   it('expect report to log error and report to sentry', () => {
     config.ravenWasInstalled = true
-    const raven = require('raven')
+    const raven = require('@sentry/node')
 
     log.report({
       scope: 'call.failed'
