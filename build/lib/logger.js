@@ -62,7 +62,6 @@ var TracingLogger = /** @class */ (function (_super) {
     __extends(TracingLogger, _super);
     function TracingLogger(options) {
         var _this = _super.call(this, options) || this;
-        console.log('options.sentry ', options.sentry);
         _this.sentry = options.sentry;
         return _this;
     }

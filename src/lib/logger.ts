@@ -27,7 +27,6 @@ export class TracingLogger extends Logger {
   sentry?: typeof Sentry
   constructor(options: TracingLoggerOptions) {
     super(options as LoggerOptions)
-    console.log('options.sentry ', options.sentry)
     this.sentry = options.sentry
   }
 
