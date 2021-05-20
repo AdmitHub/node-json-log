@@ -1,9 +1,15 @@
 import Logger, { LoggerOptions } from 'bunyan';
+import * as Sentry from '@sentry/node';
 export declare type NotFunction<T> = T extends Function ? never : T;
 export declare type LogObject<T> = {
     [key: string]: NotFunction<T>;
 };
+export declare type TracingLoggerOptions = LoggerOptions & {
+    sentry?: typeof Sentry;
+};
 export declare class TracingLogger extends Logger {
+    sentry?: typeof Sentry;
+    constructor(options: TracingLoggerOptions);
     report<T>(obj?: LogObject<T> | Error | string, ...params: NotFunction<T>[]): void;
     trace(): boolean;
     trace<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void;
@@ -20,5 +26,5 @@ export declare class TracingLogger extends Logger {
     scopedLogEmitter<T>(logLevel: number, obj: LogObject<T> | Error | undefined, ...params: any[]): void;
     _isLogInScope(data: any): boolean;
 }
-declare const createLogger: (options?: LoggerOptions) => TracingLogger;
+declare const createLogger: (options?: TracingLoggerOptions) => TracingLogger;
 export { createLogger };

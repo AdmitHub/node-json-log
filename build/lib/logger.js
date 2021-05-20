@@ -57,12 +57,13 @@ exports.createLogger = exports.TracingLogger = void 0;
 var config_1 = __importDefault(require("./config"));
 var bunyan_1 = __importStar(require("bunyan"));
 var os_1 = __importDefault(require("os"));
-var Raven = __importStar(require("@sentry/node"));
 var serializers_1 = __importDefault(require("./serializers"));
 var TracingLogger = /** @class */ (function (_super) {
     __extends(TracingLogger, _super);
-    function TracingLogger() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function TracingLogger(options) {
+        var _this = _super.call(this, options) || this;
+        _this.sentry = options.sentry;
+        return _this;
     }
     TracingLogger.prototype.report = function (obj) {
         var params = [];
@@ -100,9 +101,9 @@ var TracingLogger = /** @class */ (function (_super) {
             toLog = { err: exception };
             message = 'Unknown data type provided';
         }
-        if (config_1.default.ravenWasInstalled) {
-            Raven.setTag('scope', toLog.scope);
-            toLog.sentry_id = Raven.captureException(exception);
+        if (this.sentry) {
+            this.sentry.setTag('scope', toLog.scope);
+            toLog.sentry_id = this.sentry.captureException(exception);
             sentryMsg = '[Logged to Sentry]';
         }
         else {
@@ -203,7 +204,8 @@ var createLogger = function (options) {
         serializers: serializers,
         src: false,
         streams: streams,
-        name: os_1.default.hostname().split('-cmd')[0]
+        name: os_1.default.hostname().split('-cmd')[0],
+        sentry: options.sentry
     };
     return new TracingLogger(defaultOptions);
 };

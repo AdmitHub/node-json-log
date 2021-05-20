@@ -1,4 +1,4 @@
-import config from '../src/lib/config'
+import { TracingLoggerOptions } from '../src/lib/logger'
 
 describe('TracingLogger', () => {
   const OLD_ENV = process.env
@@ -18,10 +18,6 @@ describe('TracingLogger', () => {
     }
     const logger = require('../src')
     log = logger.createLogger()
-    jest.mock('@sentry/node', () => ({
-      captureException: jest.fn(),
-      setTag: jest.fn()
-    }))
     spyLogTrace = jest.spyOn(require('bunyan').prototype, 'trace')
     spyLogDebug = jest.spyOn(require('bunyan').prototype, 'debug')
     spyLogInfo = jest.spyOn(require('bunyan').prototype, 'info')
@@ -98,14 +94,27 @@ describe('TracingLogger', () => {
   })
 
   it('expect report to log error and report to sentry', () => {
-    config.ravenWasInstalled = true
-    const raven = require('@sentry/node')
+    jest.resetModules()
+    spyLogError = jest.spyOn(require('bunyan').prototype, 'error')
+    const captureExceptionMock = jest.fn();
+    const setTagMock = jest.fn();
+
+
+    const logger = require('../src')
+    log = logger.createLogger({
+      sentry: {
+        captureException: captureExceptionMock,
+        setTag: setTagMock
+      } as any,
+      name: 'asd'
+    } as TracingLoggerOptions)
 
     log.report({
       scope: 'call.failed'
     }, 'Reported Log')
 
     expect(spyLogError).toHaveBeenCalled()
-    expect(raven.captureException).toHaveBeenCalled()
+    expect(captureExceptionMock.mock.calls.length).toBe(1);
+    expect(setTagMock.mock.calls.length).toBe(1);
   })
 })

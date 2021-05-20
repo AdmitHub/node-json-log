@@ -14,16 +14,22 @@ import Logger, {
   LogLevelString,
 } from 'bunyan'
 import os from 'os'
-import  * as Raven from '@sentry/node'
-
+import * as Sentry from '@sentry/node'
 import enforcedSerializers from './serializers'
 
 export type NotFunction<T> = T extends Function ? never : T
 export type LogObject<T> = {
   [key: string]: NotFunction<T>
 }
+export type TracingLoggerOptions = LoggerOptions & { sentry?: typeof Sentry }
 
 export class TracingLogger extends Logger {
+  sentry?: typeof Sentry
+  constructor(options: TracingLoggerOptions) {
+    super(options as LoggerOptions)
+    this.sentry  = options.sentry
+  }
+
   report<T>(obj?: LogObject<T> | Error | string, ...params: NotFunction<T>[]) {
     const data = obj
     let exception: Error
@@ -54,9 +60,9 @@ export class TracingLogger extends Logger {
       message = 'Unknown data type provided'
     }
 
-    if (config.ravenWasInstalled) {
-      Raven.setTag('scope', toLog.scope)
-      toLog.sentry_id = Raven.captureException(exception)
+    if (this.sentry) {
+      this.sentry.setTag('scope', toLog.scope)
+      toLog.sentry_id = this.sentry.captureException(exception)
 
       sentryMsg = '[Logged to Sentry]'
     } else {
@@ -132,7 +138,7 @@ export class TracingLogger extends Logger {
   }
 }
 
-const createLogger = (options: LoggerOptions = { name: '' }): TracingLogger => {
+const createLogger = (options: TracingLoggerOptions = { name: '' }): TracingLogger => {
   const streams: Stream[] = [
     {
       level: config.logLevel as LogLevel,
@@ -153,12 +159,13 @@ const createLogger = (options: LoggerOptions = { name: '' }): TracingLogger => {
     serializers = {...serializers, ...options.serializers}
   }
 
-  const defaultOptions: LoggerOptions = {
+  const defaultOptions: TracingLoggerOptions = {
     level: config.logLevel as (LogLevel | undefined),
     serializers,
     src: false,
     streams,
-    name: os.hostname().split('-cmd')[0]
+    name: os.hostname().split('-cmd')[0],
+    sentry: options.sentry
   }
 
   return new TracingLogger(defaultOptions)
