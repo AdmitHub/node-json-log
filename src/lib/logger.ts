@@ -18,8 +18,13 @@ import  * as Raven from '@sentry/node'
 
 import enforcedSerializers from './serializers'
 
+export type NotFunction<T> = T extends Function ? never : T
+export type LogObject<T> = {
+  [key: string]: NotFunction<T>
+}
+
 export class TracingLogger extends Logger {
-  report(obj?: { [key: string]: any } | string, ...params: any[]) {
+  report<T>(obj?: LogObject<T> | Error | string, ...params: NotFunction<T>[]) {
     const data = obj
     let exception: Error
     let toLog: { [key: string]: any }
@@ -36,26 +41,22 @@ export class TracingLogger extends Logger {
       message = exception.message
     } else if (data && typeof data === 'object') {
       if (data.err instanceof Error || data.error instanceof Error) {
-        exception = data.err || data.error
+        exception = (data.err || data.error) as unknown as Error
       } else {
-        exception = new Error(data.err || data.error || 'No error provided')
+        const error = (data.err || data.error || 'No error provided') as string
+        exception = new Error(error)
       }
-      toLog = {...data, err: exception}
+      toLog = { ...data, err: exception }
       message = exception.message
     } else {
       exception = new Error('Unknown data type provided')
-      toLog = {err: exception}
+      toLog = { err: exception }
       message = 'Unknown data type provided'
     }
 
     if (config.ravenWasInstalled) {
-      const sentryObject = {
-        tags: {
-          scope: toLog.scope
-        }
-      }
-
-      toLog.sentry_id = Raven.captureException(exception, sentryObject)
+      Raven.setTag('scope', toLog.scope)
+      toLog.sentry_id = Raven.captureException(exception)
 
       sentryMsg = '[Logged to Sentry]'
     } else {
@@ -64,49 +65,49 @@ export class TracingLogger extends Logger {
     }
 
     if (message) {
-      params = [message, ...params]
+      params = [message, ...params] as NotFunction<T>[]
     }
 
     return this.scopedLogEmitter(ERROR, toLog, ...params, sentryMsg)
   }
 
   trace(): boolean
-  trace(error: Error | any, ...params: any[]): void
-  trace(obj?: object, ...params: any[]): void | boolean {
+  trace<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void
+  trace<T>(obj?: LogObject<T>, ...params: NotFunction<T>[]): void | boolean {
     return this.scopedLogEmitter(TRACE, obj, ...params)
   }
 
   debug(): boolean
-  debug(error: Error | any, ...params: any[]): void
-  debug(obj?: object, ...params: any[]): void | boolean {
+  debug<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void
+  debug<T>(obj?: LogObject<T>, ...params: any[]): void | boolean {
     return this.scopedLogEmitter(DEBUG, obj, ...params)
   }
 
-  info(error: Error | any, ...params: any[]): void
   info(): boolean
-  info(obj?: object, ...params: any[]): void | boolean {
+  info<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void
+  info<T>(obj?: LogObject<T>, ...params: NotFunction<T>[]): void | boolean {
     return this.scopedLogEmitter(INFO, obj, ...params)
   }
 
   warn(): boolean
-  warn(error: Error | any, ...params: any[]): void
-  warn(obj?: object, ...params: any[]): void | boolean {
+  warn<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void
+  warn<T>(obj?: LogObject<T>, ...params: NotFunction<T>[]): void | boolean {
     return this.scopedLogEmitter(WARN, obj, ...params)
   }
 
   error(): boolean
-  error(error: Error | any, ...params: any[]): void
-  error(obj?: object, ...params: any[]): void | boolean {
+  error<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void
+  error<T>(obj?: LogObject<T>, ...params: NotFunction<T>[]): void | boolean {
     return this.scopedLogEmitter(ERROR, obj, ...params)
   }
 
   fatal(): boolean
-  fatal(error: Error | any, ...params: any[]): void
-  fatal(obj?: object, ...params: any[]): void | boolean {
+  fatal<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void
+  fatal<T>(obj?: LogObject<T>, ...params: any[]): void | boolean {
     return this.scopedLogEmitter(FATAL, obj, ...params)
   }
 
-  scopedLogEmitter(logLevel: number, obj: object | undefined, ...params: any[]): void {
+  scopedLogEmitter<T>(logLevel: number, obj: LogObject<T> | Error | undefined, ...params: any[]): void {
     const currentEnabledLevel: number = super.level()
     const isLogInScope: boolean = this._isLogInScope(obj)
     let level: number = logLevel
@@ -131,7 +132,7 @@ export class TracingLogger extends Logger {
   }
 }
 
-const createLogger = (options: LoggerOptions = {name: ''}): TracingLogger => {
+const createLogger = (options: LoggerOptions = { name: '' }): TracingLogger => {
   const streams: Stream[] = [
     {
       level: config.logLevel as LogLevel,
@@ -163,4 +164,4 @@ const createLogger = (options: LoggerOptions = {name: ''}): TracingLogger => {
   return new TracingLogger(defaultOptions)
 }
 
-export {createLogger}
+export { createLogger }

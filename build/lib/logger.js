@@ -86,10 +86,11 @@ var TracingLogger = /** @class */ (function (_super) {
         }
         else if (data && typeof data === 'object') {
             if (data.err instanceof Error || data.error instanceof Error) {
-                exception = data.err || data.error;
+                exception = (data.err || data.error);
             }
             else {
-                exception = new Error(data.err || data.error || 'No error provided');
+                var error = (data.err || data.error || 'No error provided');
+                exception = new Error(error);
             }
             toLog = __assign(__assign({}, data), { err: exception });
             message = exception.message;
@@ -100,12 +101,8 @@ var TracingLogger = /** @class */ (function (_super) {
             message = 'Unknown data type provided';
         }
         if (config_1.default.ravenWasInstalled) {
-            var sentryObject = {
-                tags: {
-                    scope: toLog.scope
-                }
-            };
-            toLog.sentry_id = Raven.captureException(exception, sentryObject);
+            Raven.setTag('scope', toLog.scope);
+            toLog.sentry_id = Raven.captureException(exception);
             sentryMsg = '[Logged to Sentry]';
         }
         else {
