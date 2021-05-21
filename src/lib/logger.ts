@@ -25,9 +25,9 @@ export type TracingLoggerOptions = Omit<LoggerOptions, 'name'> & { sentry?: type
 
 export class TracingLogger extends Logger {
   sentry?: typeof Sentry
-  constructor(options: TracingLoggerOptions) {
-    super(options as LoggerOptions)
-    this.sentry = options.sentry
+  constructor(options: LoggerOptions, sentry?: typeof Sentry) {
+    super(options)
+    this.sentry = sentry
   }
 
   report<T>(obj?: LogObject<T> | Error | string, ...params: NotFunction<T>[]) {
@@ -164,11 +164,10 @@ const createLogger = (options: TracingLoggerOptions = {}): TracingLogger => {
     serializers,
     src: false,
     streams,
-    name: os.hostname().split('-cmd')[0],
-    sentry: options.sentry
+    name: os.hostname().split('-cmd')[0]
   }
 
-  return new TracingLogger(defaultOptions)
+  return new TracingLogger(defaultOptions, options.sentry)
 }
 
 export { createLogger }

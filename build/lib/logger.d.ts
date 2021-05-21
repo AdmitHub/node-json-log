@@ -11,7 +11,7 @@ export declare type TracingLoggerOptions = Omit<LoggerOptions, 'name'> & {
 };
 export declare class TracingLogger extends Logger {
     sentry?: typeof Sentry;
-    constructor(options: TracingLoggerOptions);
+    constructor(options: LoggerOptions, sentry?: typeof Sentry);
     report<T>(obj?: LogObject<T> | Error | string, ...params: NotFunction<T>[]): void;
     trace(): boolean;
     trace<T>(error: LogObject<T> | Error, ...params: NotFunction<T>[]): void;

@@ -60,9 +60,9 @@ var os_1 = __importDefault(require("os"));
 var serializers_1 = __importDefault(require("./serializers"));
 var TracingLogger = /** @class */ (function (_super) {
     __extends(TracingLogger, _super);
-    function TracingLogger(options) {
+    function TracingLogger(options, sentry) {
         var _this = _super.call(this, options) || this;
-        _this.sentry = options.sentry;
+        _this.sentry = sentry;
         return _this;
     }
     TracingLogger.prototype.report = function (obj) {
@@ -204,9 +204,8 @@ var createLogger = function (options) {
         serializers: serializers,
         src: false,
         streams: streams,
-        name: os_1.default.hostname().split('-cmd')[0],
-        sentry: options.sentry
+        name: os_1.default.hostname().split('-cmd')[0]
     };
-    return new TracingLogger(defaultOptions);
+    return new TracingLogger(defaultOptions, options.sentry);
 };
 exports.createLogger = createLogger;
