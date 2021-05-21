@@ -21,7 +21,7 @@ export type NotFunction<T> = T extends Function ? never : T
 export type LogObject<T> = {
   [key: string]: NotFunction<T>
 }
-export type TracingLoggerOptions = Omit<LoggerOptions, 'name'> & { sentry?: typeof Sentry }
+export type TracingLoggerOptions = Omit<LoggerOptions, 'name'> & { sentry?: typeof Sentry, name?: string, additionalStreams?: Stream }
 
 export class TracingLogger extends Logger {
   sentry?: typeof Sentry
@@ -138,7 +138,7 @@ export class TracingLogger extends Logger {
   }
 }
 
-const createLogger = (options: TracingLoggerOptions = { name: '' }): TracingLogger => {
+const createLogger = (options: TracingLoggerOptions = {}): TracingLogger => {
   const streams: Stream[] = [
     {
       level: config.logLevel as LogLevel,
@@ -159,7 +159,7 @@ const createLogger = (options: TracingLoggerOptions = { name: '' }): TracingLogg
     serializers = {...serializers, ...options.serializers}
   }
 
-  const defaultOptions: TracingLoggerOptions = {
+  const defaultOptions: LoggerOptions = {
     level: config.logLevel as (LogLevel | undefined),
     serializers,
     src: false,

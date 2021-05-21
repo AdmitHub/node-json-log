@@ -182,7 +182,7 @@ var TracingLogger = /** @class */ (function (_super) {
 }(bunyan_1.default));
 exports.TracingLogger = TracingLogger;
 var createLogger = function (options) {
-    if (options === void 0) { options = { name: '' }; }
+    if (options === void 0) { options = {}; }
     var streams = [
         {
             level: config_1.default.logLevel,

@@ -1,4 +1,4 @@
-import Logger, { LoggerOptions } from 'bunyan';
+import Logger, { LoggerOptions, Stream } from 'bunyan';
 import * as Sentry from '@sentry/node';
 export declare type NotFunction<T> = T extends Function ? never : T;
 export declare type LogObject<T> = {
@@ -6,6 +6,8 @@ export declare type LogObject<T> = {
 };
 export declare type TracingLoggerOptions = Omit<LoggerOptions, 'name'> & {
     sentry?: typeof Sentry;
+    name?: string;
+    additionalStreams?: Stream;
 };
 export declare class TracingLogger extends Logger {
     sentry?: typeof Sentry;
