@@ -147,10 +147,7 @@ const createLogger = (options: TracingLoggerOptions = {}): TracingLogger => {
   ]
 
   if (options.additionalStreams) {
-    streams.push({
-      level: config.logLevel as LogLevel,
-      stream: options.additionalStreams
-    })
+    streams.push(options.additionalStreams)
   }
 
   let serializers = {...stdSerializers, ...enforcedSerializers}
